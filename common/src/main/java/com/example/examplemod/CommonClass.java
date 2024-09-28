@@ -51,18 +51,19 @@ public class CommonClass {
     public static void dumpTags(String loaderApiVersion, MinecraftServer server) {
         //dumpTags(server);
         String loader = Services.PLATFORM.getPlatformName() + " `" + loaderApiVersion + "`";
-        var dumpedTags = new LinkedHashMap<String, List<TagKey<?>>>();
+        var dumpedTags = new LinkedHashMap<String, List<Pair<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
 
         var tagNames = server.registryAccess().registries()
                 .filter(registryEntry -> registryEntry.key().location().getNamespace().equals("minecraft"))
                 .map(RegistryAccess.RegistryEntry::value)
-                .flatMap(Registry::getTagNames)
-                .filter(tagKey -> tagKey.location().getNamespace().equals("c"))
-                .sorted(Comparator.comparing(a -> a.registry().location().getPath()))
+                .flatMap(Registry::getTags)
+                .filter(pair -> pair.getFirst().location().getNamespace().equals("c"))
+                .sorted(Comparator.comparing(a -> a.getFirst().registry().location().getPath()))
                 .toList();
 
-        for (TagKey<?> tagKey : tagNames) {
-            dumpedTags.computeIfAbsent(tagKey.registry().location().getPath(), k -> new ArrayList<>(100)).add(tagKey);
+        for (Pair<? extends TagKey<?>, ? extends HolderSet.Named<?>> pair : tagNames) {
+            var tagKey = pair.getFirst();
+            dumpedTags.computeIfAbsent(tagKey.registry().location().getPath(), k -> new ArrayList<>(100)).add(pair);
         }
 
         var fullOutput = new StringBuilder(1_000);
@@ -74,10 +75,12 @@ public class CommonClass {
             fullOutput.repeat('-', tagType.length()).append('\n');
 
             dumpedTags.get(tagType).stream()
-                    .map(TagKey::location)
-                    .map(ResourceLocation::toString)
-                    .sorted()
-                    .forEachOrdered(tagString -> fullOutput.append("- `").append(tagString).append('`').append('\n'));
+                .sorted(Comparator.comparing(p -> p.getFirst().location().toString()))
+                .forEachOrdered(pair -> {
+                    var tagString = pair.getFirst().location().toString();
+                    fullOutput.append("- `").append(tagString).append('`').append('\n');
+                    pair.getSecond().forEach(holder -> fullOutput.append("  - `").append(holder.getRegisteredName()).append('`').append('\n'));
+                });
         }
 
         var dumpPath = server.getServerDirectory().resolve(loader.replace("`", "") + " tags dump.md");
