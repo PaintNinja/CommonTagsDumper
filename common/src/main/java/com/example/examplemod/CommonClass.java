@@ -54,12 +54,12 @@ public class CommonClass {
         var dumpedTags = new LinkedHashMap<String, List<Pair<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
 
         var tagNames = server.registryAccess().registries()
-                .filter(registryEntry -> registryEntry.key().location().getNamespace().equals("minecraft"))
-                .map(RegistryAccess.RegistryEntry::value)
-                .flatMap(Registry::getTags)
-                .filter(pair -> pair.getFirst().location().getNamespace().equals("c"))
-                .sorted(Comparator.comparing(a -> a.getFirst().registry().location().getPath()))
-                .toList();
+                           .filter(registryEntry -> registryEntry.key().location().getNamespace().equals("minecraft"))
+                           .map(RegistryAccess.RegistryEntry::value)
+                           .flatMap(Registry::getTags)
+                           .filter(pair -> pair.getFirst().location().getNamespace().equals("c"))
+                           .sorted(Comparator.comparing(a -> a.getFirst().registry().location().getPath()))
+                           .toList();
 
         for (Pair<? extends TagKey<?>, ? extends HolderSet.Named<?>> pair : tagNames) {
             var tagKey = pair.getFirst();
@@ -79,7 +79,9 @@ public class CommonClass {
                 .forEachOrdered(pair -> {
                     var tagString = pair.getFirst().location().toString();
                     fullOutput.append("- `").append(tagString).append('`').append('\n');
-                    pair.getSecond().forEach(holder -> fullOutput.append("  - `").append(holder.getRegisteredName()).append('`').append('\n'));
+                    pair.getSecond().stream()
+                        .sorted(Comparator.comparing(Holder::getRegisteredName))
+                        .forEachOrdered(holder -> fullOutput.append("  - `").append(holder.getRegisteredName()).append('`').append('\n'));
                 });
         }
 
@@ -100,7 +102,7 @@ public class CommonClass {
 
     public static void dumpTags(MinecraftServer server) {
         var loadedBlockTags = server.registryAccess().registryOrThrow(Registries.BLOCK).getTags()
-                .toList();
+                                  .toList();
         for (var tag : loadedBlockTags) {
             Constants.LOG.info("Block tag: {}", tag);
         }
@@ -108,10 +110,10 @@ public class CommonClass {
 
     private static <T> List<String> getTag(MinecraftServer server, ResourceKey<Registry<T>> registryKey, TagKey<T> tagKey) {
         return server.registryAccess().registryOrThrow(registryKey).getTag(tagKey).orElseThrow()
-                .stream()
-                .map(Holder::value)
-                .distinct()
-                .map(Object::toString)
-                .toList();
+                   .stream()
+                   .map(Holder::value)
+                   .distinct()
+                   .map(Object::toString)
+                   .toList();
     }
 }
