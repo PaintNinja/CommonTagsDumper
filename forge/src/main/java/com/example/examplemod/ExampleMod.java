@@ -25,7 +25,7 @@ public class ExampleMod {
     public static void onServerStarted(ServerStartedEvent event) {
         // get NeoForge version
         var forgeVersion = ModList.get()
-                .getModFileById("neoforge")
+                .getModFileById("forge")
                 .getMods()
                 .getFirst()
                 .getVersion();
