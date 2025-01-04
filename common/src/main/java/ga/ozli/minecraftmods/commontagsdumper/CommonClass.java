@@ -31,7 +31,7 @@ public class CommonClass {
         var tagNames = server.registryAccess().registries()
                            .filter(registryEntry -> registryEntry.key().location().getNamespace().equals("minecraft"))
                            .map(RegistryAccess.RegistryEntry::value)
-                           .flatMap(Registry::getTags)
+                           .flatMap(r -> r.getTags().map(t -> Pair.of(t.key(), t)))
                            .filter(pair -> namespaces.contains(pair.getFirst().location().getNamespace()))
                            .sorted(Comparator.comparing(a -> a.getFirst().registry().location().getPath()))
                            .toList();
