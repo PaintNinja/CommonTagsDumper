@@ -1,6 +1,5 @@
 package ga.ozli.minecraftmods.commontagsdumper;
 
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -9,7 +8,7 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 @Mod(Constants.MOD_ID)
 public class CommonTagsDumperNeoForge {
 
-    public CommonTagsDumperNeoForge(IEventBus eventBus) {
+    public CommonTagsDumperNeoForge() {
         NeoForge.EVENT_BUS.addListener(CommonTagsDumperNeoForge::onServerStarted);
     }
 

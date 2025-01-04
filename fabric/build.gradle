@@ -13,20 +13,20 @@ dependencies {
 }
 
 loom {
-    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    File aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
     runs {
         client {
             client()
-            setConfigName('Fabric Client')
+            configName = 'Fabric Client'
             ideConfigGenerated(true)
             runDir('runs/client')
         }
         server {
             server()
-            setConfigName('Fabric Server')
+            configName = 'Fabric Server'
             ideConfigGenerated(true)
             runDir('runs/server')
         }

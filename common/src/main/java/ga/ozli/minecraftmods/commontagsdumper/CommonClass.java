@@ -1,10 +1,8 @@
 package ga.ozli.minecraftmods.commontagsdumper;
 
 import ga.ozli.minecraftmods.commontagsdumper.platform.Services;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
@@ -26,18 +24,18 @@ public class CommonClass {
 
     public static void dumpTags(String loaderApiVersion, MinecraftServer server, Set<String> namespaces) {
         String loader = Services.PLATFORM.getPlatformName() + " `" + loaderApiVersion + "`";
-        var dumpedTags = new LinkedHashMap<String, List<Pair<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
+        var dumpedTags = new LinkedHashMap<String, List<Map.Entry<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
 
         var tagNames = server.registryAccess().registries()
                            .filter(registryEntry -> registryEntry.key().location().getNamespace().equals("minecraft"))
                            .map(RegistryAccess.RegistryEntry::value)
-                           .flatMap(r -> r.getTags().map(t -> Pair.of(t.key(), t)))
-                           .filter(pair -> namespaces.contains(pair.getFirst().location().getNamespace()))
-                           .sorted(Comparator.comparing(a -> a.getFirst().registry().location().getPath()))
+                           .flatMap(r -> r.getTags().map(t -> Map.entry(t.key(), t)))
+                           .filter(pair -> namespaces.contains(pair.getKey().location().getNamespace()))
+                           .sorted(Comparator.comparing(a -> a.getKey().registry().location().getPath()))
                            .toList();
 
-        for (Pair<? extends TagKey<?>, ? extends HolderSet.Named<?>> pair : tagNames) {
-            var tagKey = pair.getFirst();
+        for (Map.Entry<? extends TagKey<?>, ? extends HolderSet.Named<?>> pair : tagNames) {
+            var tagKey = pair.getKey();
             dumpedTags.computeIfAbsent(tagKey.registry().location().getPath(), k -> new ArrayList<>(100)).add(pair);
         }
 
@@ -50,11 +48,11 @@ public class CommonClass {
             fullOutput.repeat('-', tagType.length()).append('\n');
 
             dumpedTags.get(tagType).stream()
-                .sorted(Comparator.comparing(p -> p.getFirst().location().toString()))
+                .sorted(Comparator.comparing(p -> p.getKey().location().toString()))
                 .forEachOrdered(pair -> {
-                    var tagString = pair.getFirst().location().toString();
+                    var tagString = pair.getKey().location().toString();
                     fullOutput.append("- `").append(tagString).append('`').append('\n');
-                    pair.getSecond().stream()
+                    pair.getValue().stream()
                         .sorted(Comparator.comparing(Holder::getRegisteredName))
                         .forEachOrdered(holder -> fullOutput.append("    - `").append(holder.getRegisteredName()).append('`').append('\n'));
                 });
@@ -72,6 +70,8 @@ public class CommonClass {
 
         dumpedTags.forEach((tagType, tags) -> tags.clear());
         dumpedTags.clear();
+        fullOutput.setLength(0);
+        fullOutput.trimToSize();
         System.gc();
     }
 }
