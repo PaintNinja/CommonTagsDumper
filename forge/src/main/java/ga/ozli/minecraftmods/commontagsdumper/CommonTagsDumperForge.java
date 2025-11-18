@@ -1,6 +1,5 @@
 package ga.ozli.minecraftmods.commontagsdumper;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -9,7 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 public class CommonTagsDumperForge {
 
     public CommonTagsDumperForge() {
-        MinecraftForge.EVENT_BUS.addListener(CommonTagsDumperForge::onServerStarted);
+        ServerStartedEvent.BUS.addListener(CommonTagsDumperForge::onServerStarted);
     }
 
     public static void onServerStarted(ServerStartedEvent event) {
