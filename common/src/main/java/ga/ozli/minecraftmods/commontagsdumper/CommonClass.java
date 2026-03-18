@@ -20,10 +20,18 @@ public final class CommonClass {
     private CommonClass() {}
 
     public static void dumpTags(String loaderApiVersion, MinecraftServer server) {
-        dumpTags(loaderApiVersion, server, Set.of("c"));
+        dumpTags(loaderApiVersion, server, false);
+    }
+
+    public static void dumpTags(String loaderApiVersion, MinecraftServer server, boolean summary) {
+        dumpTags(loaderApiVersion, server, Set.of("c"), summary);
     }
 
     public static void dumpTags(String loaderApiVersion, MinecraftServer server, Set<String> namespaces) {
+        dumpTags(loaderApiVersion, server, namespaces, false);
+    }
+
+    public static void dumpTags(String loaderApiVersion, MinecraftServer server, Set<String> namespaces, boolean summary) {
         String loader = Services.PLATFORM.getPlatformName() + " `" + loaderApiVersion + "`";
         var dumpedTags = new LinkedHashMap<String, List<Map.Entry<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
 
@@ -42,7 +50,9 @@ public final class CommonClass {
         }
 
         var fullOutput = new StringBuilder(1_000);
-        fullOutput.append(loader).append(" c tags").append('\n');
+        fullOutput.append(loader).append(" c tags");
+        if (summary) fullOutput.append(" summary");
+        fullOutput.append('\n');
         fullOutput.repeat('=', 7 + loader.length()).append('\n');
 
         for (String tagType : dumpedTags.keySet()) {
@@ -54,13 +64,14 @@ public final class CommonClass {
                 .forEachOrdered(pair -> {
                     var tagString = pair.getKey().location().toString();
                     fullOutput.append("- `").append(tagString).append('`').append('\n');
+                    if (summary) return;
                     pair.getValue().stream()
                         .sorted(Comparator.comparing(Holder::getRegisteredName))
                         .forEachOrdered(holder -> fullOutput.append("    - `").append(holder.getRegisteredName()).append('`').append('\n'));
                 });
         }
 
-        var dumpPath = server.getServerDirectory().resolve(loader.replace("`", "") + " tags dump.md");
+        var dumpPath = server.getServerDirectory().resolve(loader.replace("`", "") + " tags dump" + (summary ? " summary" : "") + ".md");
         try {
             Files.writeString(dumpPath, fullOutput.toString());
         } catch (IOException e) {
