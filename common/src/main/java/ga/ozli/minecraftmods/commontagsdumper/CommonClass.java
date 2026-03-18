@@ -3,6 +3,7 @@ package ga.ozli.minecraftmods.commontagsdumper;
 import ga.ozli.minecraftmods.commontagsdumper.platform.Services;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
@@ -15,7 +16,7 @@ import java.util.*;
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
 // common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
 // however it will be compatible with all supported mod loaders.
-public class CommonClass {
+public final class CommonClass {
     private CommonClass() {}
 
     public static void dumpTags(String loaderApiVersion, MinecraftServer server) {
@@ -27,16 +28,17 @@ public class CommonClass {
         var dumpedTags = new LinkedHashMap<String, List<Map.Entry<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
 
         var tagNames = server.registryAccess().registries()
-                           .filter(registryEntry -> registryEntry.key().location().getNamespace().equals("minecraft"))
-                           .map(RegistryAccess.RegistryEntry::value)
-                           .flatMap(r -> r.getTags().map(t -> Map.entry(t.key(), t)))
-                           .filter(pair -> namespaces.contains(pair.getKey().location().getNamespace()))
-                           .sorted(Comparator.comparing(a -> a.getKey().registry().location().getPath()))
-                           .toList();
+                .filter(registryEntry -> registryEntry.key().identifier().getNamespace().equals("minecraft"))
+                .map(RegistryAccess.RegistryEntry::value)
+                .flatMap(Registry::getTags)
+                .map(tag -> Map.entry(tag.key(), tag))
+                .filter(pair -> namespaces.contains(pair.getKey().location().getNamespace()))
+                .sorted(Comparator.comparing(a -> a.getKey().registry().identifier().getPath()))
+                .toList();
 
         for (Map.Entry<? extends TagKey<?>, ? extends HolderSet.Named<?>> pair : tagNames) {
             var tagKey = pair.getKey();
-            dumpedTags.computeIfAbsent(tagKey.registry().location().getPath(), k -> new ArrayList<>(100)).add(pair);
+            dumpedTags.computeIfAbsent(tagKey.registry().identifier().getPath(), k -> new ArrayList<>(100)).add(pair);
         }
 
         var fullOutput = new StringBuilder(1_000);
