@@ -1,33 +1,48 @@
 plugins {
+    id 'idea'
+    id 'eclipse'
     id 'multiloader-loader'
-    id 'fabric-loom'
-}
-dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    id 'net.fabricmc.fabric-loom'
 }
 
 loom {
-    File aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
-    if (aw.exists()) {
-        accessWidenerPath.set(aw)
-    }
     runs {
+        configureEach {
+            runDir = '../run'
+        }
+
         client {
             client()
-            configName = 'Fabric Client'
-            ideConfigGenerated(true)
-            runDir('runs/client')
         }
+
         server {
             server()
-            configName = 'Fabric Server'
-            ideConfigGenerated(true)
-            runDir('runs/server')
+//            args '--nogui'
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}+${minecraft_version}"
+}
+
+// Implement mcgradleconventions loader attribute
+final loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, 'fabric')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
+        configurations.named(variant) {
+            attributes {
+                attribute(loaderAttribute, 'fabric')
+            }
         }
     }
 }

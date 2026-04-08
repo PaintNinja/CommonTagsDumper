@@ -6,4 +6,10 @@ The mod currently only works in a development environment, but we are looking to
 
 While this was made as part of https://github.com/MinecraftForge/MinecraftForge/pull/9955, we hope this will be useful for other loaders as well to validate their tags against other loaders, avoid mistakes and improve interoperability between all loaders.
 
-To use it, simply import the project into your IDE and run the server for each loader. The markdown files will be generated in the run folder for each loader as soon as the server has finished starting up.
+To use it, simply import the project into your IDE and run the server for each loader. The markdown files will be generated in the root run folder as soon as the server has finished starting up.
+
+## Runs
+For convenience, here are the runs for each loader in alphabetical order:
+- `gradlew fabric:runServer`
+- `gradlew forge:runServer`
+- `gradlew neo:runServer`

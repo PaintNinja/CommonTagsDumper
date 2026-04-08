@@ -19,9 +19,11 @@ public class CommonTagsDumperNeoForge {
                 .getMods()
                 .getFirst()
                 .getVersion();
-        var neoForgeVersionString = neoForgeVersion.getMajorVersion() + "." + neoForgeVersion.getMinorVersion() + "." + neoForgeVersion.getIncrementalVersion();
-        if (neoForgeVersion.getQualifier() != null)
-            neoForgeVersionString += "-" + neoForgeVersion.getQualifier();
+        // https://github.com/neoforged/NeoForge/issues/3077
+//        var neoForgeVersionString = neoForgeVersion.getMajorVersion() + "." + neoForgeVersion.getMinorVersion() + "." + neoForgeVersion.getIncrementalVersion();
+//        if (neoForgeVersion.getQualifier() != null)
+//            neoForgeVersionString += "-" + neoForgeVersion.getQualifier();
+        var neoForgeVersionString = neoForgeVersion.getQualifier();
 
         CommonClass.dumpTags(neoForgeVersionString, event.getServer());
 

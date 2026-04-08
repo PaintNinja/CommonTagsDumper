@@ -3,35 +3,33 @@ plugins {
     id 'idea'
     id 'eclipse'
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle'
+    id 'net.neoforged.moddev'
 }
 
-base.archivesName = "${mod_name}-forge-${minecraft_version}"
+neoForge {
+    version = neo_version
 
-minecraft {
     runs {
         configureEach {
-            workingDir = this.layout.projectDirectory.dir('../run')
-            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+            gameDirectory = this.layout.projectDirectory.dir('../run')
         }
 
-        register('client')
+        register('client') {
+            client()
+        }
 
         register('server') {
-            args '--nogui'
+            server()
+//            args '--nogui'
+        }
+
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
         }
     }
-}
-
-repositories {
-    minecraft.mavenizer(it)
-    maven fg.forgeMaven
-    maven fg.minecraftLibsMaven
-    mavenCentral()
-}
-
-dependencies {
-    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
 }
 
 // Implement mcgradleconventions loader attribute
@@ -39,7 +37,7 @@ final loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', Str
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
     configurations.named(variant) {
         attributes {
-            attribute(loaderAttribute, 'forge')
+            attribute(loaderAttribute, 'neoforge')
         }
     }
 }
@@ -47,7 +45,7 @@ sourceSets.configureEach {
     [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
         configurations.named(variant) {
             attributes {
-                attribute(loaderAttribute, 'forge')
+                attribute(loaderAttribute, 'neoforge')
             }
         }
     }

@@ -1,19 +1,11 @@
 plugins {
+    id 'java'
     id 'multiloader-common'
-    id 'net.neoforged.moddev'
-}
-
-neoForge {
-    neoFormVersion = neo_form_version
-    // Automatically enable AccessTransformers if the file exists
-    File at = file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformers.from(at.absolutePath)
-    }
+    id 'net.fabricmc.fabric-loom'
 }
 
 dependencies {
-    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.7'
+    minecraft "com.mojang:minecraft:$minecraft_version"
 }
 
 configurations {
@@ -30,4 +22,23 @@ configurations {
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+// Implement mcgradleconventions loader attribute
+final loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, 'common')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
+        configurations.named(variant) {
+            attributes {
+                attribute(loaderAttribute, 'common')
+            }
+        }
+    }
 }

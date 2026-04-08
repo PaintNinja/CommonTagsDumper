@@ -12,7 +12,7 @@ public class CommonTagsDumperForge {
     }
 
     public static void onServerStarted(ServerStartedEvent event) {
-        var forgeVersion = ModList.get()
+        var forgeVersion = ModList
                 .getModFileById("forge")
                 .getMods()
                 .getFirst()

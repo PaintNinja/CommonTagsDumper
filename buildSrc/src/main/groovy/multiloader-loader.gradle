@@ -13,8 +13,9 @@ configurations {
 
 dependencies {
     compileOnly(project(':common')) {
-        capabilities {
-            requireCapability "$group:$mod_id"
+        final loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+        attributes {
+            attribute(loaderAttribute, 'common')
         }
     }
     commonJava project(path: ':common', configuration: 'commonJava')
@@ -22,23 +23,23 @@ dependencies {
 }
 
 tasks.named('compileJava', JavaCompile) {
-    dependsOn(configurations.commonJava)
-    source(configurations.commonJava)
+    dependsOn configurations.commonJava
+    source configurations.commonJava
 }
 
-processResources {
-    dependsOn(configurations.commonResources)
-    from(configurations.commonResources)
+tasks.named('processResources', ProcessResources) {
+    dependsOn configurations.commonResources
+    from configurations.commonResources
 }
 
 tasks.named('javadoc', Javadoc) {
-    dependsOn(configurations.commonJava)
-    source(configurations.commonJava)
+    dependsOn configurations.commonJava
+    source configurations.commonJava
 }
 
 tasks.named('sourcesJar', Jar) {
-    dependsOn(configurations.commonJava)
-    from(configurations.commonJava)
-    dependsOn(configurations.commonResources)
-    from(configurations.commonResources)
+    dependsOn configurations.commonJava
+    from configurations.commonJava
+    dependsOn configurations.commonResources
+    from configurations.commonResources
 }

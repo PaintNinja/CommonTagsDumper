@@ -11,7 +11,6 @@
         "sources": "https://github.com/PaintNinja/CommonTagsDumper"
     },
     "license": "${license}",
-    "icon": "${mod_id}.png",
     "environment": "*",
     "entrypoints": {
         "main": [
@@ -23,8 +22,5 @@
         "fabric-api": "*",
         "minecraft": "${minecraft_version}",
         "java": ">=${java_version}"
-    },
-    "suggests": {
-        "another-mod": "*"
     }
 }
