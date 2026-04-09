@@ -16,23 +16,23 @@ import java.util.*;
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
 // common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
 // however it will be compatible with all supported mod loaders.
-public final class CommonClass {
+final class CommonClass {
     private CommonClass() {}
 
-    public static void dumpTags(String loaderApiVersion, MinecraftServer server) {
-        dumpTags(loaderApiVersion, server, false);
+    static void dumpTags(MinecraftServer server) {
+        dumpTags(server, false);
     }
 
-    public static void dumpTags(String loaderApiVersion, MinecraftServer server, boolean summary) {
-        dumpTags(loaderApiVersion, server, Set.of("c"), summary);
+    static void dumpTags(MinecraftServer server, boolean summary) {
+        dumpTags(server, Set.of("c"), summary);
     }
 
-    public static void dumpTags(String loaderApiVersion, MinecraftServer server, Set<String> namespaces) {
-        dumpTags(loaderApiVersion, server, namespaces, false);
+    static void dumpTags(MinecraftServer server, Set<String> namespaces) {
+        dumpTags(server, namespaces, false);
     }
 
-    public static void dumpTags(String loaderApiVersion, MinecraftServer server, Set<String> namespaces, boolean summary) {
-        String loader = Services.PLATFORM.getPlatformName() + " `" + loaderApiVersion + "`";
+    static void dumpTags(MinecraftServer server, Set<String> namespaces, boolean summary) {
+        String loader = Services.PLATFORM.getPlatformName() + " `" + Services.PLATFORM.getPlatformVersion() + "`";
         var dumpedTags = new LinkedHashMap<String, List<Map.Entry<? extends TagKey<?>, ? extends HolderSet.Named<?>>>>();
 
         var tagNames = server.registryAccess().registries()

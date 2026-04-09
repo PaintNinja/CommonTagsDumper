@@ -1,17 +1,21 @@
 package ga.ozli.minecraftmods.commontagsdumper.platform;
 
 import ga.ozli.minecraftmods.commontagsdumper.platform.services.IPlatformHelper;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.ModList;
 
-public class NeoForgePlatformHelper implements IPlatformHelper {
-
+public final class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public String getPlatformName() {
         return "NeoForge";
     }
 
     @Override
-    public boolean isDevelopmentEnvironment() {
-        return !FMLLoader.getCurrent().isProduction();
+    public String getPlatformVersion() {
+        return ModList.get()
+                .getModFileById("neoforge")
+                .getMods()
+                .getFirst()
+                .getVersion()
+                .toString();
     }
 }
